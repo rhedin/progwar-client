@@ -22,9 +22,21 @@ class PickGame extends Component {
                 }
                 </ol>
                 load a file that contains a new game<br />
-                <input type="file" />
+                <input type="file" className="button" id="getGameFile" style={ {display:'none'} } onChange={this.loadGameFile} />
+                <label htmlFor="getGameFile">Choose file</label>
             </div>
         );
+    }
+    
+    loadGameFile(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            console.log(e.target.result);
+        };
+        reader.readAsText(file);
+        // event.target.value = file.name + ' loaded';
+        event.target.value = '';
     }
 }
 
