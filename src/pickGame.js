@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import 'whatwg-fetch';
 
 class PickGame extends Component {
     constructor(props) {
@@ -39,16 +40,23 @@ class PickGame extends Component {
         const reader = new FileReader();
         reader.onload = (e) => {
             console.log(e.target.result);
-            this.sendGameToServer(e.target.result);
+            this.sendGameToServer(file.name, e.target.result);
         };
         reader.readAsText(file);
         event.target.value = '';
     }
     
-    sendGameToServer(fileText) {
+    sendGameToServer(fileName, fileText) {
         fetch('https://progwar-server-rhedin.c9users.io/gameToServer', {
         // fetch('https://game-rhedin.c9users.io/sendInfo', {
-            method: 'POST',
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: fileName,
+                text: fileText,
+            }),
         })
         .then(resp => {
             if (resp.ok) {
@@ -60,6 +68,9 @@ class PickGame extends Component {
                     statusText: resp.statusText,
                 });
             }
+        })
+        .then(data => {
+            console.log(data);
         })
         .catch(error => {
             console.log('function: sendGameToServer  error: fetch failed');
