@@ -17,6 +17,7 @@ class App extends Component {
   constructor() {
     super();
     this.state = this.initState();
+    this.initBoard = this.initBoard.bind(this);
   }
   
   render() {
@@ -46,7 +47,18 @@ class App extends Component {
           
           <Route path="/pickBots" component={PickBots} />
           <Route path="/startGame" component={StartGame} />
-          <Route path="/webWorkers" component={WebWorkers} />
+          {/* <Route path="/webWorkers" component={WebWorkers} /> */}
+          <Route
+            path="/webWorkers"
+            render={
+              (props) => (
+                <WebWorkers
+                  {...props}
+                  initBoard={this.initBoard}
+                />
+              )
+            }
+          />
           <Route
             path="/home"
             render={() => 
@@ -81,6 +93,10 @@ class App extends Component {
         }
       ]
     }
+  }
+  
+  initBoard(contract) {
+    console.log(`In initBoard in app component.  contract=${contract}`);
   }
 }
 
