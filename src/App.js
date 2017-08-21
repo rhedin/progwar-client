@@ -10,6 +10,7 @@ import {
 import PickGame from './pickGame';
 import PickBots from './pickBots';
 import StartGame from './startGame';
+import WebWorkers from './webWorkers';
 
 class App extends Component {
   
@@ -45,6 +46,7 @@ class App extends Component {
           
           <Route path="/pickBots" component={PickBots} />
           <Route path="/startGame" component={StartGame} />
+          <Route path="/webWorkers" component={WebWorkers} />
           <Route
             path="/home"
             render={() => 
@@ -56,6 +58,7 @@ class App extends Component {
                 <Link to="startGame">Start the game.</Link><br />
                 (At some point, the game will terminate, and you will be given the <br />
                 option to come back here)<br />
+                <Link to="webWorkers">Try web workers.</Link><br />
               </div>
             } 
           />
