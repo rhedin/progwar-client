@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import * as referee from './referee';
 
 class WebWorkers extends Component {
     constructor(props) {
@@ -46,10 +47,10 @@ class WebWorkers extends Component {
     }
     
     doGame() {
-        // Establish all three web workers.
         
-        var referee = new Worker('referee.js');
-        referee.addEventListener('message', referee.receiveMessage, false);
+        // Establish all three web workers.
+
+        referee.createWebworker();
         
         var player1 = new Worker('player1.js');
         player1.addEventListener('message', player1.receiveMessage, false);
@@ -59,7 +60,7 @@ class WebWorkers extends Component {
         
         // Get contract from contract web worker. 
         
-        var contract = await referee.getContract();
+        var contract = /*await*/ referee.getContract();
         
         // Inform game of initial board.  Includes number of squares.
         
@@ -74,8 +75,8 @@ class WebWorkers extends Component {
             // Get move from player 1 worker.  Ask referee whether legal. 
             // Inform game of move.  This could end the game. 
             
-            move = await player1.getMove(this.props.board);
-            verdict = await referee.evalMove(this.props.board, move);
+            move = /*await*/ player1.getMove(this.props.board);
+            verdict = /*await*/ referee.evalMove(this.props.board, move);
             this.props.movePieces(move, verdict);
             if (verdict.gameOver) {
                 console.log('Game over.');
@@ -84,8 +85,8 @@ class WebWorkers extends Component {
             
             // Get move from player 2 worker. 
             
-            move = await player2.getMove(this.props.board);
-            verdict = await referee.evalMove(this.props.board, move);
+            move = /*await*/ player2.getMove(this.props.board);
+            verdict = /*await*/ referee.evalMove(this.props.board, move);
             this.props.movePieces(move, verdict);
             if (verdict.gameOver) {
                 console.log('Game over.');
@@ -95,7 +96,7 @@ class WebWorkers extends Component {
             
         // Stop all three web workers.
 
-        referee.terminate();
+        referee.destroyWebworker();
         player1.terminate();
         player2.terminate();
 
