@@ -18,6 +18,12 @@ class App extends Component {
     super();
     this.state = this.initState();
     this.initBoard = this.initBoard.bind(this);
+    this.getSquare = this.getSquare.bind(this);
+    this.getSquareString = this.getSquareString.bind(this);
+    this.setSquare = this.setSquare.bind(this);
+    this.board = [];
+    this.xdim = 0;
+    this.ydim = 0;
   }
   
   render() {
@@ -46,7 +52,17 @@ class App extends Component {
           />
           
           <Route path="/pickBots" component={PickBots} />
-          <Route path="/startGame" component={StartGame} />
+          <Route 
+            path="/startGame" 
+            render={
+              (props) => (
+                <StartGame 
+                  {...props}
+                  getSquareString={this.getSquareString}
+                />
+              )
+            }
+          />
           {/* <Route path="/webWorkers" component={WebWorkers} /> */}
           <Route
             path="/webWorkers"
@@ -94,9 +110,43 @@ class App extends Component {
       ]
     }
   }
+    
+  getSquare(x, y) {
+    console.log(`getSquare ${this.xdim}`);
+    return this.board[this.xdim * y + x];
+  }
+  
+  getSquareString(x, y) {
+    console.log(`getSquareString ${this.xdim}`);
+    var square = this.getSquare(x, y);
+    return square === null ? '    ' : `${square.playerNumber}-${square.pieceNumber}`;
+  }
+  
+  // position is {playerNumber, x, y, pieceNumber}
+  setSquare(x, y, position) {
+    console.log(`setSquare ${this.xdim}`);
+    this.board[this.xdim * y + x] = position;
+  }
+  // And this would be a good place for a typescript-style shape definition.
   
   initBoard(contract) {
-    console.log(`In initBoard in app component.  contract=${contract}`);
+    console.log(`initBoard ${this.xdim}`);
+    console.log(`In initBoard in app component.  contract=${JSON.stringify(contract)}`);
+    this.xdim = contract.xdim;
+    this.ydim = contract.ydim;
+    for (let x = 0; x < this.xdim; x++) {
+      for (let y = 0; y < this.ydim; y++) {
+        this.setSquare(x, y, null);
+      }
+    }
+    for (let position in contract.player1initialPositions) {
+      this.setSquare({playerNumber: position.playerNumber, x: position.x, y: position.y, pieceNumber: position.pieceNumber});
+    }
+    for (let position in contract.player2initialPositions) {
+      this.setSquare({playerNumber: position.playerNumber, x: position.x, y: position.y, pieceNumber: position.pieceNumber});
+      // Good place for spread assignment.  Oh, well.
+    }
+    console.log(`When leaving initBoard ${this.xdim}`);
   }
 }
 

@@ -5,7 +5,12 @@ addEventListener('message', function (e) {
             postMessage({
                 cmd: 'returningContract',
                 contract: {
-                    
+                    xdim: 3,
+                    ydim: 3,
+                    player1initialPositions: [
+                    ],
+                    player2initialPositions: [
+                    ]
                 }
             });
         default:

@@ -1,11 +1,21 @@
 import React, { Component } from 'react';
-import * as referee from './referee';
+// import * as referee from './referee';
 
 class WebWorkers extends Component {
+    
+    referee = null;
+    player1 = null;
+    player2 = null;
+    // I'm shocked that this is how you define a data member.
+    // I was expecting let myvar, or var myvar. 
+    
     constructor(props) {
         super(props);
         this.startWebworkers = this.startWebworkers.bind(this);
         this.doGame = this.doGame.bind(this);
+        this.refereeReceiveMessage = this.refereeReceiveMessage.bind(this);
+        this.player1ReceiveMessage = this.player1ReceiveMessage.bind(this);
+        this.player2ReceiveMessage = this.player2ReceiveMessage.bind(this);
     }
     
     render() {
@@ -50,59 +60,56 @@ class WebWorkers extends Component {
         
         // Establish all three web workers.
 
-        referee.createWebworker();
+        this.referee = new Worker('refereeWorker.js');
+        this.referee.addEventListener('message', this.refereeReceiveMessage, false);
         
-        var player1 = new Worker('player1.js');
-        player1.addEventListener('message', player1.receiveMessage, false);
+        this.player1 = new Worker('player1worker.js');
+        this.player1.addEventListener('message', this.player1ReceiveMessage, false);
         
-        var player2 = new Worker('player2.js');
-        player2.addEventListener('message', player2.receiveMessage, false);
+        this.player2 = new Worker('player2worker.js');
+        this.player2.addEventListener('message', this.player2ReceiveMessage, false);
         
-        // Get contract from contract web worker. 
+        // Request contract from contract web worker. 
         
-        var contract = /*await*/ referee.getContract();
-        
-        // Inform game of initial board.  Includes number of squares.
-        
-        this.props.initBoard(contract);
-        
-        // In loop.
-        
-        while (true) {
-            var move;
-            var verdict;
-        
-            // Get move from player 1 worker.  Ask referee whether legal. 
-            // Inform game of move.  This could end the game. 
-            
-            move = /*await*/ player1.getMove(this.props.board);
-            verdict = /*await*/ referee.evalMove(this.props.board, move);
-            this.props.movePieces(move, verdict);
-            if (verdict.gameOver) {
-                console.log('Game over.');
-                break;
-            }
-            
-            // Get move from player 2 worker. 
-            
-            move = /*await*/ player2.getMove(this.props.board);
-            verdict = /*await*/ referee.evalMove(this.props.board, move);
-            this.props.movePieces(move, verdict);
-            if (verdict.gameOver) {
-                console.log('Game over.');
-                break;
-            }
-        }
-            
-        // Stop all three web workers.
-
-        referee.destroyWebworker();
-        player1.terminate();
-        player2.terminate();
-
+        this.referee.postMessage({
+            cmd: 'getContract',
+        });
     }
     // For now, we're assuming that both players politely wait until 
     // the conductor asks them for their move.
+    
+    
+    refereeReceiveMessage(e) {
+        switch(e.data.cmd) {
+            case 'returningContract':
+                console.log(`message to referee - returningContract`);
+                this.props.initBoard(e.data.contract);
+                this.player1.postMessage({
+                    cmd: 'getMove',
+                });
+                break;
+            default: 
+                console.log(`Unrecognized commmand from referee:  ${e.data.cmd}`);
+                break;
+        }
+    }
+    
+    
+    player1ReceiveMessage(e) {
+        switch(e.data.cmd) {
+            case 'getMove':
+                console.log(`Got move from player1:  e.data.move = ${e.data.move}`);
+                break;
+            default: 
+                console.log(`Unrecognized commmand from player1:  ${e.data.cmd}`);
+                break;
+        }
+    }
+    
+    
+    player2ReceiveMessage(e) {
+        
+    }
 }
 
 export default WebWorkers;
