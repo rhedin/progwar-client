@@ -8,6 +8,12 @@ addEventListener('message', function (e) {
                     xdim: 3,
                     ydim: 3,
                     player1initialPositions: [
+                        {
+                            playerNumber: 0,
+                            x: 1, 
+                            y: 1, 
+                            pieceNumber: 2,
+                        },
                     ],
                     player2initialPositions: [
                     ]

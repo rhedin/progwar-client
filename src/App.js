@@ -5,7 +5,6 @@ import {
   BrowserRouter,
   Link,
   Route, 
-  Redirect
 } from 'react-router-dom';
 import PickGame from './pickGame';
 import PickBots from './pickBots';
@@ -34,7 +33,18 @@ class App extends Component {
             <img src={logo} className="App-logo" alt="logo" />
             <h2>Welcome to React</h2>
           </div>
-          <Route exact path="/" render={() => <Redirect to="/home" />} />
+
+          <div>
+            <Link to="pickGame">Pick the game to play.</Link><br />
+                (From there, you can also upload a new game contract)<br />
+            <Link to="pickBots">Pick the two opponents.  Both must be computer programs.</Link><br />
+                (From there, you can also upload a computer program)<br />
+            <Link to="startGame">Start the game.</Link><br />
+            (At some point, the game will terminate, and you will be given the <br />
+            option to come back here)<br />
+            <Link to="webWorkers">Try web workers.</Link><br />
+          </div>
+
           {/*
           This doesn't pass the props.  Using render= rather than component= is designed for that.
           <Route path="/pickGame" component={PickGame} gameContracts={this.state.gameContracts} />
@@ -74,21 +84,6 @@ class App extends Component {
                 />
               )
             }
-          />
-          <Route
-            path="/home"
-            render={() => 
-              <div>
-                <Link to="pickGame">Pick the game to play.</Link><br />
-                    (From there, you can also upload a new game contract)<br />
-                <Link to="pickBots">Pick the two opponents.  Both must be computer programs.</Link><br />
-                    (From there, you can also upload a computer program)<br />
-                <Link to="startGame">Start the game.</Link><br />
-                (At some point, the game will terminate, and you will be given the <br />
-                option to come back here)<br />
-                <Link to="webWorkers">Try web workers.</Link><br />
-              </div>
-            } 
           />
         </div>
       </BrowserRouter>
@@ -139,11 +134,11 @@ class App extends Component {
         this.setSquare(x, y, null);
       }
     }
-    for (let position in contract.player1initialPositions) {
-      this.setSquare({playerNumber: position.playerNumber, x: position.x, y: position.y, pieceNumber: position.pieceNumber});
+    for (let position of contract.player1initialPositions) {
+      this.setSquare(position.x, position.y, {playerNumber: position.playerNumber, pieceNumber: position.pieceNumber});
     }
-    for (let position in contract.player2initialPositions) {
-      this.setSquare({playerNumber: position.playerNumber, x: position.x, y: position.y, pieceNumber: position.pieceNumber});
+    for (let position of contract.player2initialPositions) {
+      this.setSquare(position.x, position.y, {playerNumber: position.playerNumber, pieceNumber: position.pieceNumber});
       // Good place for spread assignment.  Oh, well.
     }
     console.log(`When leaving initBoard ${this.xdim}`);
